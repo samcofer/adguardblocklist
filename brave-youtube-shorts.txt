@@ -1,0 +1,38 @@
+! Title: cofer — YouTube Shorts block (Brave Shields)
+! Description: Hides YouTube Shorts entry points and stops in-app Shorts playback.
+!   Companion to the HKLM URLBlocklist policy (windows-desktop-config
+!   Configure-BrowserPolicy.ps1), which only stops full page loads of /shorts/.
+!   YouTube is a single-page app: clicking a Short inside an open YouTube tab
+!   is a history.pushState URL change + XHR, never a navigation, so the policy
+!   cannot see it. This list closes that gap in the browser's content blocker.
+! Known limitation (tested 2026-11-06, Brave 1.98): a Short reached through a
+!   link this list does not hide (e.g. a link in a comment) still plays its
+!   first video — its media comes over the same youtubei/googlevideo calls as
+!   normal videos, so it cannot be network-blocked without breaking YouTube.
+!   With the player hidden that is audio over a blank page, and the feed can't
+!   advance to the next Short (reel API blocked).
+! Homepage: https://github.com/samcofer/adguardblocklist
+! Expires: 1 day
+! Subscribe: brave://settings/shields/filters -> "Add custom filter lists"
+!   https://raw.githubusercontent.com/samcofer/adguardblocklist/main/brave-youtube-shorts.txt
+!
+! ---- in-app Shorts feed / player API
+||youtube.com/youtubei/v1/reel/
+!
+! ---- entry points (selectors verified against live DOM 2026-11-06)
+! left guide "Shorts" entry
+youtube.com##ytd-guide-entry-renderer:has(a[title="Shorts"])
+! home page Shorts shelf
+youtube.com##ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts])
+! search results Shorts grid shelf
+youtube.com##grid-shelf-view-model:has(ytm-shorts-lockup-view-model)
+! watch page sidebar Shorts shelf
+youtube.com##ytd-reel-shelf-renderer
+! any single Short tile in a feed/grid/results list
+youtube.com##ytd-rich-item-renderer:has(a[href^="/shorts/"])
+youtube.com##ytd-video-renderer:has(a[href^="/shorts/"])
+! channel page "Shorts" tab
+youtube.com##yt-tab-shape[tab-title="Shorts"]
+!
+! ---- the Shorts player itself, if reached anyway
+youtube.com##ytd-shorts
